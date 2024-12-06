@@ -16,7 +16,7 @@ A Python script for transcribing large audio files using the Groq API, with supp
 
 ### 1. Clone the Repository
 ```bash
-git clone https://your-repo-url.git
+git clone https://transcript-with-whisper-groq.git
 cd audio-transcription-tool
 ```
 

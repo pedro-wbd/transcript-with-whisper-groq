@@ -3,7 +3,7 @@ groq>=0.3.0
 python-dotenv>=1.0.0
 
 # Audio processing
-ffmpeg-python>=0.4.8
+ffmpeg
 
 # Development and typing
 typing>=3.7.4

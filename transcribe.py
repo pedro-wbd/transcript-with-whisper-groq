@@ -125,12 +125,12 @@ class GroqTranscriber:
 
 class AudioTranscriptionProcessor:
     """Orchestrates the entire audio transcription process."""
-    
+
     @staticmethod
     def process_audio(input_file: str, 
-                      output_file: str, 
-                      language: Optional[str] = None,
-                      prompt: Optional[str] = None) -> None:
+                    output_file: str, 
+                    language: Optional[str] = None,
+                    prompt: Optional[str] = None) -> None:
         """
         Process audio file: downsample, split, transcribe, and combine.
         
@@ -140,13 +140,27 @@ class AudioTranscriptionProcessor:
             language (Optional[str]): Language of the audio
             prompt (Optional[str]): Context prompt for transcription
         """
+        # Ensure input file exists
+        input_file = os.path.abspath(input_file)
+
+        if not os.path.exists(input_file):
+            raise FileNotFoundError(f"Input file not found: {input_file}")
+
+
         preprocessor = AudioFilePreprocessor()
         transcriber = GroqTranscriber()
         
-        # Downsample audio
-        downsampled_file = f"{input_file}_downsampled.mp3"
-        preprocessor.downsample_audio(input_file, downsampled_file)
+        # Use absolute paths for downsampled and output files
+        downsampled_file = os.path.abspath(f"{input_file}_downsampled.mp3")
+
+        output_file = os.path.abspath(output_file)
         
+        # Ensure output directory exists
+        os.makedirs(os.path.dirname(output_file), exist_ok=True)
+        
+        # Downsample audio
+        preprocessor.downsample_audio(input_file, downsampled_file)    
+            
         # Split audio if necessary
         audio_chunks = preprocessor.split_audio_file(downsampled_file)
         
@@ -166,12 +180,17 @@ class AudioTranscriptionProcessor:
         # Combine transcriptions and save
         with open(output_file, 'w', encoding='utf-8') as f:
             f.write('\n\n'.join(full_transcription))
+
         
         # Clean up temporary files
         os.remove(downsampled_file)
-        for chunk in audio_chunks:
-            if chunk != input_file:
-                os.remove(chunk)
+
+        # FIXME test with large audio files (>25MB), and fix following lines 
+        # for chunk in audio_chunks:
+        #     if chunk != input_file:
+        #         os.remove(chunk)
+        #         print("oelo 15")
+
 
 def main():
     """CLI entry point for audio transcription."""
